@@ -4,7 +4,7 @@ from pyspark.sql.functions import *
 from pyspark import pipelines as dp
 
 # create a streaming table to auto loder incoming data
-@dp.table(name="drivers")
+@dp.table(name="bronze.drivers")
 # check data quality
 @dp.expect_all_or_drop({
     "driver_id_is_not_null": "driver_id is not null",
@@ -13,7 +13,7 @@ from pyspark import pipelines as dp
     "vehicle_id_is_not_null" : "vehicle_id is not null"
 })
 # define the function to read and save the data
-def customers():
+def dirvers():
     df = (
         spark.readStream.table("trips_catalog.landing.drivers")
     ).select(

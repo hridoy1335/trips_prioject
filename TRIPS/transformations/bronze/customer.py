@@ -4,7 +4,7 @@ from pyspark.sql.functions import *
 from pyspark import pipelines as dp
 
 # create a streaming table to auto loder incoming data
-@dp.table(name="customers")
+@dp.table(name="bronze.customers")
 # check data quality
 @dp.expect_all_or_drop({
     "customer_id_is_not_null": "customer_id is not null",
