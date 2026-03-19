@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "2"
+# ///
 # MAGIC %md
 # MAGIC ### Example Exploratory Notebook
 # MAGIC
@@ -17,3 +21,72 @@ sys.path.append("/Workspace/TRIPS/trips_prioject/TRIPS")
 # !!! Before performing any data analysis, make sure to run the pipeline to materialize the sample datasets. The tables referenced in this notebook depend on that step.
 
 display(spark.sql("SELECT * FROM trips_catalog.bronze.sample_aggregation_trips"))
+
+# COMMAND ----------
+
+customer = spark.read.table("trips_catalog.bronze.customers")
+display(customer)
+
+# COMMAND ----------
+
+from pyspark.sql.types import *
+from pyspark.sql.functions import *
+
+customer = customer.withColumn("first_name", trim(col("first_name")))\
+                   .withColumn("last_name", trim(col("last_name")))\
+                   .withColumn("email", lower(trim(regexp_replace("email", "[^a-zA-Z0-9@._-]", ""))))\
+                   .withColumn("phone_number", regexp_replace(trim("phone_number"), "[^0-9]", ""))\
+                   .withColumn("city", trim(col("city")))\
+                   .orderBy("customer_id")
+customer.display()
+
+# COMMAND ----------
+
+driver = spark.read.table("trips_catalog.bronze.drivers")
+driver = driver.withColumn("first_name", trim(col("first_name")))\
+               .withColumn("last_name", trim(col("last_name")))\
+               .withColumn("phone_number", regexp_replace(trim("phone_number"), "[^0-9]", ""))\
+               .withColumn("city", trim(col("city")))\
+               .orderBy("driver_id")
+driver.display()
+
+# COMMAND ----------
+
+location = spark.read.table("trips_catalog.bronze.locations")
+location = location.withColumn(
+display(location)
+
+# COMMAND ----------
+
+payment = spark.read.table("trips_catalog.bronze.payments")
+payment = payment.withColumn("payment_method", trim(col("payment_method")))\
+                 .withColumn("payment_status", trim(col("payment_status")))\
+                 .orderBy("payment_id")
+
+payment.display()
+
+# COMMAND ----------
+
+trip = spark.read.table("trips_catalog.bronze.trips")
+trip = trip.withColumn("start_location", trim(col("start_location")))\
+           .withColumn("end_location", trim(col("end_location")))\
+           .withColumn("payment_method", trim(col("payment_method")))\
+           .withColumn("trip_status", trim(col("trip_status")))\
+           .orderBy("trip_id")
+
+trip.display()
+
+# COMMAND ----------
+
+vehicle = spark.read.table("trips_catalog.bronze.vehicles")
+vehicle = vehicle.withColumn("license_plate", trim(col("license_plate")))\
+                .withColumn("model", trim(col("model")))\
+                .withColumn("make", trim(col("make")))\
+                .withColumn("vehicle_type", trim(col("vehicle_type")))\
+                .orderBy("vehicle_id")
+
+vehicle.display()
+
+# COMMAND ----------
+
+
